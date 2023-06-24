@@ -7,15 +7,17 @@ using System.Threading;
 
 class Program
 {
+    private static int Nb;
+
     static void Main()
     {
-        int Nb = 0;
+        Nb = 0;
         while (true)
         {
             string getid=GetId();
             Console.Clear();
-            Console.WriteLine(getid);
-            Console.WriteLine(Nb);
+            Console.WriteLine("getid "+getid);
+            Console.WriteLine("Nb    "+Nb);
             if (Nb++ > 30)
                 {
                     Nb = 0;
@@ -60,24 +62,43 @@ class Program
 
     private static string GetId()
     {
-        HttpClient client = new HttpClient();
+        try
+        {
+            HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(10);
 
-        HttpResponseMessage response = client.GetAsync("https://tools.alize-sas.fr/serveur/GetId.php").Result;
-        response.EnsureSuccessStatusCode();
-        string responseBody = response.Content.ReadAsStringAsync().Result;
+            HttpResponseMessage response = client.GetAsync("https://tools.alize-sas.fr/serveur/GetId.php").Result;
+            response.EnsureSuccessStatusCode();
+            string responseBody = response.Content.ReadAsStringAsync().Result;
 
-        return responseBody;
+            return responseBody;
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine(ex.Message);
+            Nb = 0;
+            return "0";
+        }
     }
 
     private static string httpsenv(string jvar)
     {
-        HttpClient client = new HttpClient();
+        try
+        {
+            HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(10);
 
-        HttpResponseMessage response = client.GetAsync("https://tools.alize-sas.fr/serveur/GetVm.php" + jvar).Result;
-        response.EnsureSuccessStatusCode();
-        string responseBody = response.Content.ReadAsStringAsync().Result;
+            HttpResponseMessage response = client.GetAsync("https://tools.alize-sas.fr/serveur/GetVm.php" + jvar).Result;
+            response.EnsureSuccessStatusCode();
+            string responseBody = response.Content.ReadAsStringAsync().Result;
 
-        return responseBody;
+            return responseBody;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return "0";
+        }
     }
 
     private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
